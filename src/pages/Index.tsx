@@ -3,11 +3,12 @@ import { EmailInput } from "@/components/EmailInput";
 import { ThreatMeter } from "@/components/ThreatMeter";
 import { AnalysisResults, AnalysisResult } from "@/components/AnalysisResults";
 import { UrlAnalyzer } from "@/components/UrlAnalyzer";
+import { PasswordChecker } from "@/components/PasswordChecker";
 import { analyzeEmail } from "@/lib/emailAnalyzer";
-import { Shield, Zap, Eye, Lock, Mail, Globe } from "lucide-react";
+import { Shield, Zap, Eye, Lock, Mail, Globe, KeyRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type TabType = "email" | "url";
+type TabType = "email" | "url" | "password";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabType>("email");
@@ -29,6 +30,7 @@ const Index = () => {
   const tabs = [
     { id: "email" as const, label: "Email Scanner", icon: Mail },
     { id: "url" as const, label: "URL Scanner", icon: Globe },
+    { id: "password" as const, label: "Password Checker", icon: KeyRound },
   ];
 
   return (
@@ -126,7 +128,7 @@ const Index = () => {
 
         {/* Main Content */}
         <main className="container max-w-6xl mx-auto px-4 pb-16">
-          {activeTab === "email" ? (
+          {activeTab === "email" && (
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Left Column - Input */}
               <div className="space-y-6">
@@ -142,9 +144,15 @@ const Index = () => {
                 <AnalysisResults results={results} />
               </div>
             </div>
-          ) : (
+          )}
+          {activeTab === "url" && (
             <div className="max-w-2xl mx-auto">
               <UrlAnalyzer />
+            </div>
+          )}
+          {activeTab === "password" && (
+            <div className="max-w-2xl mx-auto">
+              <PasswordChecker />
             </div>
           )}
         </main>
