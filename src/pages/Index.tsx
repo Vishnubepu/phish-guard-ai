@@ -2,10 +2,15 @@ import { useState } from "react";
 import { EmailInput } from "@/components/EmailInput";
 import { ThreatMeter } from "@/components/ThreatMeter";
 import { AnalysisResults, AnalysisResult } from "@/components/AnalysisResults";
+import { UrlAnalyzer } from "@/components/UrlAnalyzer";
 import { analyzeEmail } from "@/lib/emailAnalyzer";
-import { Shield, Zap, Eye, Lock } from "lucide-react";
+import { Shield, Zap, Eye, Lock, Mail, Globe } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+type TabType = "email" | "url";
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState<TabType>("email");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState<AnalysisResult | null>(null);
 
@@ -20,6 +25,11 @@ const Index = () => {
     setResults(analysisResults);
     setIsAnalyzing(false);
   };
+
+  const tabs = [
+    { id: "email" as const, label: "Email Scanner", icon: Mail },
+    { id: "url" as const, label: "URL Scanner", icon: Globe },
+  ];
 
   return (
     <div className="min-h-screen bg-background cyber-grid">
@@ -63,12 +73,12 @@ const Index = () => {
             <span className="text-sm font-mono text-primary">AI-Powered Analysis</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-tight">
-            Detect Phishing Emails
+            Detect Phishing Threats
             <br />
             <span className="text-gradient-cyber">Before They Strike</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-            Paste any suspicious email to instantly analyze threat indicators, 
+            Analyze suspicious emails and URLs to identify phishing attempts, 
             validate sender authenticity, and protect yourself from cyber attacks.
           </p>
 
@@ -76,8 +86,8 @@ const Index = () => {
           <div className="flex flex-wrap justify-center gap-3 mb-12">
             {[
               { icon: Eye, label: "Content Analysis" },
-              { icon: Lock, label: "Header Verification" },
-              { icon: Shield, label: "Link Scanner" },
+              { icon: Lock, label: "Security Checks" },
+              { icon: Shield, label: "Threat Detection" },
             ].map(({ icon: Icon, label }) => (
               <div
                 key={label}
@@ -90,33 +100,63 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Tab Navigation */}
+        <div className="container max-w-6xl mx-auto px-4 mb-6">
+          <div className="flex gap-2 p-1 bg-secondary/50 rounded-xl border border-border w-fit mx-auto">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setResults(null);
+                }}
+                className={cn(
+                  "flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200",
+                  activeTab === tab.id
+                    ? "bg-primary text-primary-foreground shadow-glow"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                )}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Main Content */}
         <main className="container max-w-6xl mx-auto px-4 pb-16">
-          <div className="grid lg:grid-cols-2 gap-6">
-            {/* Left Column - Input */}
-            <div className="space-y-6">
-              <EmailInput onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
-            </div>
+          {activeTab === "email" ? (
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Left Column - Input */}
+              <div className="space-y-6">
+                <EmailInput onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
+              </div>
 
-            {/* Right Column - Results */}
-            <div className="space-y-6">
-              <ThreatMeter 
-                score={results?.overallScore ?? null} 
-                isAnalyzing={isAnalyzing} 
-              />
-              <AnalysisResults results={results} />
+              {/* Right Column - Results */}
+              <div className="space-y-6">
+                <ThreatMeter 
+                  score={results?.overallScore ?? null} 
+                  isAnalyzing={isAnalyzing} 
+                />
+                <AnalysisResults results={results} />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="max-w-2xl mx-auto">
+              <UrlAnalyzer />
+            </div>
+          )}
         </main>
 
         {/* Footer */}
         <footer className="border-t border-border/50 py-8">
           <div className="container max-w-6xl mx-auto px-4 text-center">
             <p className="text-sm text-muted-foreground font-mono">
-              PhishGuard AI • Email Threat Detection System
+              PhishGuard AI • Email & URL Threat Detection System
             </p>
             <p className="text-xs text-muted-foreground/50 mt-2">
-              For educational purposes. Always verify suspicious emails through official channels.
+              For educational purposes. Always verify suspicious content through official channels.
             </p>
           </div>
         </footer>
