@@ -8,14 +8,12 @@ interface ThreatMeterProps {
 
 export const ThreatMeter = ({ score, isAnalyzing }: ThreatMeterProps) => {
   const getThreatLevel = () => {
-    if (score === null) return { label: "Awaiting Analysis", color: "muted" };
-    if (score <= 25) return { label: "Safe", color: "success" };
-    if (score <= 50) return { label: "Low Risk", color: "success" };
-    if (score <= 75) return { label: "Suspicious", color: "warning" };
-    return { label: "High Threat", color: "destructive" };
+    if (score === null) return { label: "Awaiting Analysis", color: "muted", isThreat: null };
+    if (score <= 50) return { label: "No Threat Detected", color: "success", isThreat: false };
+    return { label: "Threat Detected", color: "destructive", isThreat: true };
   };
 
-  const { label, color } = getThreatLevel();
+  const { label, color, isThreat } = getThreatLevel();
 
   const getIcon = () => {
     if (isAnalyzing) return <ShieldQuestion className="w-8 h-8 animate-pulse" />;
@@ -26,9 +24,7 @@ export const ThreatMeter = ({ score, isAnalyzing }: ThreatMeterProps) => {
 
   const getGradientStyle = () => {
     if (score === null) return "bg-muted";
-    if (score <= 25) return "bg-success";
-    if (score <= 50) return "bg-gradient-to-r from-success to-warning";
-    if (score <= 75) return "bg-gradient-to-r from-warning to-destructive";
+    if (score <= 50) return "bg-success";
     return "bg-destructive";
   };
 
@@ -41,7 +37,6 @@ export const ThreatMeter = ({ score, isAnalyzing }: ThreatMeterProps) => {
         <div className={cn(
           "transition-colors duration-500",
           color === "success" && "text-success",
-          color === "warning" && "text-warning",
           color === "destructive" && "text-destructive",
           color === "muted" && "text-muted-foreground"
         )}>
@@ -49,22 +44,20 @@ export const ThreatMeter = ({ score, isAnalyzing }: ThreatMeterProps) => {
         </div>
       </div>
 
-      {/* Score Display */}
+      {/* YES/NO Display */}
       <div className="text-center mb-6">
         <div className={cn(
           "text-6xl font-bold font-mono transition-all duration-500",
           isAnalyzing && "animate-pulse text-primary",
           !isAnalyzing && color === "success" && "text-success",
-          !isAnalyzing && color === "warning" && "text-warning",
           !isAnalyzing && color === "destructive" && "text-destructive threat-pulse",
           !isAnalyzing && color === "muted" && "text-muted-foreground"
         )}>
-          {isAnalyzing ? "..." : score !== null ? `${score}%` : "--"}
+          {isAnalyzing ? "..." : isThreat === null ? "--" : isThreat ? "YES" : "NO"}
         </div>
         <p className={cn(
           "text-sm font-mono uppercase tracking-wider mt-2 transition-colors duration-500",
           color === "success" && "text-success",
-          color === "warning" && "text-warning",
           color === "destructive" && "text-destructive",
           color === "muted" && "text-muted-foreground"
         )}>
@@ -90,9 +83,7 @@ export const ThreatMeter = ({ score, isAnalyzing }: ThreatMeterProps) => {
       {/* Scale Labels */}
       <div className="flex justify-between mt-2 text-xs font-mono text-muted-foreground">
         <span>SAFE</span>
-        <span>LOW</span>
-        <span>MEDIUM</span>
-        <span>HIGH</span>
+        <span>THREAT</span>
       </div>
     </div>
   );
