@@ -1,12 +1,17 @@
 import { cn } from "@/lib/utils";
-import { Shield, ShieldAlert, ShieldCheck, ShieldQuestion } from "lucide-react";
+import { Shield, ShieldAlert, ShieldCheck, ShieldQuestion, AlertTriangle } from "lucide-react";
 
 interface ThreatMeterProps {
   score: number | null;
   isAnalyzing: boolean;
+  threatMessage?: {
+    title: string;
+    url?: string;
+    recommendation: string;
+  };
 }
 
-export const ThreatMeter = ({ score, isAnalyzing }: ThreatMeterProps) => {
+export const ThreatMeter = ({ score, isAnalyzing, threatMessage }: ThreatMeterProps) => {
   const getThreatLevel = () => {
     if (score === null) return { label: "Awaiting Analysis", color: "muted", isThreat: null };
     if (score <= 50) return { label: "No Threat Detected", color: "success", isThreat: false };
@@ -44,16 +49,16 @@ export const ThreatMeter = ({ score, isAnalyzing }: ThreatMeterProps) => {
         </div>
       </div>
 
-      {/* YES/NO Display */}
-      <div className="text-center mb-6">
+      {/* Score Display with Percentage */}
+      <div className="text-center mb-4">
         <div className={cn(
-          "text-6xl font-bold font-mono transition-all duration-500",
+          "text-5xl font-bold font-mono transition-all duration-500",
           isAnalyzing && "animate-pulse text-primary",
           !isAnalyzing && color === "success" && "text-success",
           !isAnalyzing && color === "destructive" && "text-destructive threat-pulse",
           !isAnalyzing && color === "muted" && "text-muted-foreground"
         )}>
-          {isAnalyzing ? "..." : isThreat === null ? "--" : isThreat ? "YES" : "NO"}
+          {isAnalyzing ? "..." : score !== null ? `${score}%` : "--"}
         </div>
         <p className={cn(
           "text-sm font-mono uppercase tracking-wider mt-2 transition-colors duration-500",
@@ -85,6 +90,28 @@ export const ThreatMeter = ({ score, isAnalyzing }: ThreatMeterProps) => {
         <span>SAFE</span>
         <span>THREAT</span>
       </div>
+
+      {/* Danger Message Box */}
+      {isThreat && threatMessage && (
+        <div className="mt-6 p-4 bg-destructive/10 border border-destructive/30 rounded-lg animate-fade-in">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-6 h-6 text-destructive flex-shrink-0 mt-0.5" />
+            <div className="space-y-2">
+              <p className="font-semibold text-destructive">
+                {threatMessage.title}
+              </p>
+              {threatMessage.url && (
+                <p className="text-sm font-mono text-muted-foreground break-all">
+                  URL: {threatMessage.url}
+                </p>
+              )}
+              <p className="text-sm text-foreground font-medium">
+                <span className="text-destructive">Recommendation:</span> {threatMessage.recommendation}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -130,6 +130,15 @@ export const UrlAnalyzer = () => {
         <ThreatMeter
           score={results?.overallScore ?? null}
           isAnalyzing={isAnalyzing}
+          threatMessage={
+            results && results.overallScore > 50
+              ? {
+                  title: "This website appears to be a phishing page targeting credential collection.",
+                  url: results.url,
+                  recommendation: "Do NOT enter personal details. Block or exit immediately.",
+                }
+              : undefined
+          }
         />
       )}
 
